@@ -56,7 +56,7 @@ class Paymium:
 
     def get_trades(self):
         resp = requests.get(
-            "https://paymium.com/api/v1/countries", verify=False)
+            "https://paymium.com/api/v1/data/eur/trades", verify=False)
         _assert_headers_ok(resp)
         return json.loads(resp.text)
 
