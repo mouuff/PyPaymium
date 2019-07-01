@@ -23,6 +23,7 @@ print(api_call_response.text)
 def main():
     p = Paymium()
     p.user_auth()
+    p.refresh_token()
 
 
 if __name__ == "__main__":

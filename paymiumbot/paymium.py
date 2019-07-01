@@ -32,17 +32,24 @@ class Paymium:
         }
         access_token_response = self.post(token_url, data)
 
-        body = json.loads(access_token_response.text)
+        self.token = json.loads(access_token_response.text)
         '''body = {"access_token": "xxx", "token_type": "bearer", "expires_in": 1800,
            "refresh_token": "xxx", "scope": "basic", "created_at": 1561993742}
         '''
-        return body
 
     def refresh_token(self):
-        pass
+        data = {
+            "client_id": client_id,
+            "client_secret": client_secret,
+            "grant_type": 'refresh_token',
+            "redirect_uri": redirect_uri,
+            "refresh_token": self.token["refresh_token"]
+        }
+        refresh_token_response = self.post(token_url, data)
+        self.token = json.loads(refresh_token_response.text)
 
     def user_auth(self):
         print(authorize_url)
         code = input('code: ')
-        self.token = self.get_token(code)
+        self.get_token(code)
         print("Auth successful")
