@@ -2,6 +2,8 @@ import requests
 import json
 import sys
 
+from .constants import Constants
+
 authorize_url = "https://www.paymium.com/api/oauth/authorize?client_id=63ad627670dd4d6b25083e2e8454dcaf53202ddf6fcb4e4a4b42aa4e8ccbcc19&redirect_uri=https%3A%2F%2Fwww.paymium.com%2Fpage%2Foauth%2Ftest&response_type=code"
 token_url = "https://paymium.com/api/oauth/token"
 redirect_uri = "https://www.paymium.com/page/oauth/test"
@@ -19,20 +21,28 @@ class Paymium:
     def __init__(self):
         self.token = None
 
-    def post(self, url, data, assert_ok=True):
+    def post(self, url, data):
         resp = requests.post(url, data=data, verify=False,
                              allow_redirects=False, auth=(client_id, client_secret))
-        if assert_ok:
-            _assert_headers_ok(resp)
+        _assert_headers_ok(resp)
         return resp
 
     def public_get(self, path):
         resp = requests.get(
-            "https://paymium.com" + path, verify=False)
+            Constants.URL_API + path, verify=False)
         _assert_headers_ok(resp)
         return json.loads(resp.text)
 
-    def get_token(self, code):
+    def get(self, path):
+        headers = {
+            "Authorization": "Bearer " + self.token["access_token"]
+        }
+        resp = requests.get(
+            Constants.URL_API + path, verify=False, headers=headers)
+        _assert_headers_ok(resp)
+        return json.loads(resp.text)
+
+    def new_token(self, code):
         data = {
             "grant_type": 'authorization_code',
             "redirect_uri": redirect_uri,
@@ -57,20 +67,11 @@ class Paymium:
     def user_auth(self):
         print(authorize_url)
         code = input('code: ')
-        self.get_token(code)
+        self.new_token(code)
         print("Auth successful")
 
     def get_trades(self):
-        resp = requests.get(
-            "https://paymium.com/api/v1/data/eur/trades", verify=False)
-        _assert_headers_ok(resp)
-        return json.loads(resp.text)
+        return self.public_get("/api/v1/data/eur/trades")
 
     def get_user(self):
-        headers = {
-            "Authorization": "Bearer " + self.token["access_token"]
-        }
-        resp = requests.get(
-            "https://paymium.com/api/v1/user", verify=False, headers=headers)
-        _assert_headers_ok(resp)
-        return json.loads(resp.text)
+        return self.get("/api/v1/user")
