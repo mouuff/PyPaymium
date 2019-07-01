@@ -20,11 +20,20 @@ class Paymium:
         self.client_id = client_id
         self.client_secret = client_secret
 
-    def post(self, url, data):
+    @property
+    def _bearer_headers(self):
+        return {"Authorization": "Bearer " + self.token["access_token"]}
+
+    def post_auth(self, url, data):
         resp = requests.post(url, data=data, verify=False,
                              allow_redirects=False, auth=(self.client_id, self.client_secret))
         _assert_headers_ok(resp)
         return resp
+
+    def post(self, path, data):
+        resp = requests.post(Constants.URL_API + path, data=data, headers=self._bearer_headers, verify=False,
+                             allow_redirects=False)
+        _assert_headers_ok(resp)
 
     def public_get(self, path):
         resp = requests.get(
@@ -33,11 +42,8 @@ class Paymium:
         return json.loads(resp.text)
 
     def get(self, path):
-        headers = {
-            "Authorization": "Bearer " + self.token["access_token"]
-        }
         resp = requests.get(
-            Constants.URL_API + path, verify=False, headers=headers)
+            Constants.URL_API + path, verify=False, headers=self._bearer_headers)
         _assert_headers_ok(resp)
         return json.loads(resp.text)
 
@@ -47,7 +53,7 @@ class Paymium:
             "redirect_uri": Constants.URL_REDIRECT,
             "code": code
         }
-        access_token_response = self.post(Constants.URL_TOKEN, data)
+        access_token_response = self.post_auth(Constants.URL_TOKEN, data)
 
         self.token = json.loads(access_token_response.text)
         '''body = {"access_token": "xxx", "token_type": "bearer", "expires_in": 1800,
@@ -60,12 +66,12 @@ class Paymium:
             "redirect_uri": Constants.URL_REDIRECT,
             "refresh_token": self.token["refresh_token"]
         }
-        refresh_token_response = self.post(Constants.URL_TOKEN, data)
+        refresh_token_response = self.post_auth(Constants.URL_TOKEN, data)
         self.token = json.loads(refresh_token_response.text)
 
     def user_auth(self):
         print("https://www.paymium.com/api/oauth/authorize?client_id=" + self.client_id +
-              "&redirect_uri=https%3A%2F%2Fwww.paymium.com%2Fpage%2Foauth%2Ftest&response_type=code")
+              "&redirect_uri=https%3A%2F%2Fwww.paymium.com%2Fpage%2Foauth%2Ftest&response_type=code&scope=basic+activity+trade")
         code = input('code: ')
         self.new_token(code)
         print("Auth successful")
@@ -78,3 +84,22 @@ class Paymium:
 
     def get_user(self):
         return self.get("/api/v1/user")
+
+    def post_order(self, data):
+        return self.post("/api/v1/user/orders", data=data)
+
+    def post_limit_order(self, direction, price, currency_amount):
+        data = {
+            "type": "LimitOrder",
+            "currency": "EUR",
+            "direction": direction,
+            "price": price,
+            "currency_amount": currency_amount,
+        }
+        return self.post_order(data)
+
+    def buy(self, price, currency_amount):
+        return self.post_limit_order("buy", price, currency_amount)
+
+    def sell(self, price, currency_amount):
+        return self.post_limit_order("sell", price, currency_amount)
