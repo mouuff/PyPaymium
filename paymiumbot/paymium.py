@@ -10,6 +10,11 @@ client_id = '63ad627670dd4d6b25083e2e8454dcaf53202ddf6fcb4e4a4b42aa4e8ccbcc19'
 client_secret = '7de4b1015e19590efb7c6abaf4db19170fd9884bc717bf2a8bb18c6c2863d924'
 
 
+def _assert_headers_ok(resp):
+    if resp.headers["Status"] != "200 OK":
+        raise AssertionError('Status != 200 OK : ' + str(resp.headers))
+
+
 class Paymium:
     def __init__(self):
         self.token = None
@@ -17,15 +22,12 @@ class Paymium:
     def post(self, url, data, assert_ok=True):
         resp = requests.post(url, data=data, verify=False,
                              allow_redirects=False, auth=(client_id, client_secret))
-        if assert_ok and resp.headers["Status"] != "200 OK":
-            raise AssertionError(
-                'Status != 200 OK : ' + str(resp.headers))
+        if assert_ok:
+            _assert_headers_ok(resp)
         return resp
 
     def get_token(self, code):
         data = {
-            "client_id": client_id,
-            "client_secret": client_secret,
             "grant_type": 'authorization_code',
             "redirect_uri": redirect_uri,
             "code": code
@@ -39,8 +41,6 @@ class Paymium:
 
     def refresh_token(self):
         data = {
-            "client_id": client_id,
-            "client_secret": client_secret,
             "grant_type": 'refresh_token',
             "redirect_uri": redirect_uri,
             "refresh_token": self.token["refresh_token"]
@@ -53,3 +53,18 @@ class Paymium:
         code = input('code: ')
         self.get_token(code)
         print("Auth successful")
+
+    def get_trades(self):
+        resp = requests.get(
+            "https://paymium.com/api/v1/countries", verify=False)
+        _assert_headers_ok(resp)
+        return json.loads(resp.text)
+
+    def get_user(self):
+        headers = {
+            "Authorization": "Bearer " + self.token["access_token"]
+        }
+        resp = requests.get(
+            "https://paymium.com/api/v1/user", verify=False, headers=headers)
+        _assert_headers_ok(resp)
+        return json.loads(resp.text)
