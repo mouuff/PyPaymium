@@ -1,4 +1,5 @@
 
+import webbrowser
 import requests
 import json
 import sys
@@ -70,9 +71,14 @@ class Paymium:
         self.token = json.loads(refresh_token_response.text)
 
     def user_auth(self):
-        print("https://www.paymium.com/api/oauth/authorize?client_id=" + self.client_id +
-              "&redirect_uri=https%3A%2F%2Fwww.paymium.com%2Fpage%2Foauth%2Ftest&response_type=code&scope=basic+activity+trade")
-        code = input('code: ')
+        url = "https://www.paymium.com/api/oauth/authorize?client_id=" + self.client_id + \
+            "&redirect_uri=https%3A%2F%2Fwww.paymium.com%2Fpage%2Foauth%2Ftest&response_type=code&scope=basic+activity+trade"
+        try:
+            webbrowser.open_new_tab(url)
+        except webbrowser.Error:
+            print("Open this url:")
+            print(url)
+        code = input('Enter code: ')
         self.new_token(code)
         print("Auth successful")
 
