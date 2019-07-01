@@ -26,6 +26,12 @@ class Paymium:
             _assert_headers_ok(resp)
         return resp
 
+    def public_get(self, path):
+        resp = requests.get(
+            "https://paymium.com" + path, verify=False)
+        _assert_headers_ok(resp)
+        return json.loads(resp.text)
+
     def get_token(self, code):
         data = {
             "grant_type": 'authorization_code',
