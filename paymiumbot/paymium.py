@@ -94,18 +94,18 @@ class Paymium:
     def post_order(self, data):
         return self.post("/api/v1/user/orders", data=data)
 
-    def post_limit_order(self, direction, price, currency_amount):
+    def post_limit_order(self, direction, price, amount):
         data = {
             "type": "LimitOrder",
             "currency": "EUR",
             "direction": direction,
             "price": price,
-            "currency_amount": currency_amount,
+            "amount": amount,
         }
         return self.post_order(data)
 
-    def buy(self, price, currency_amount):
-        return self.post_limit_order("buy", price, currency_amount)
+    def buy(self, price, amount):
+        return self.post_limit_order("buy", price, amount)
 
-    def sell(self, price, currency_amount):
-        return self.post_limit_order("sell", price, currency_amount)
+    def sell(self, price, amount):
+        return self.post_limit_order("sell", price, amount)

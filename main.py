@@ -9,7 +9,7 @@ def main():
     # print(p.get_ticker())
     p.user_auth()
     p.refresh_token()
-    print(p.get_user())
+    # print(p.get_user())
     p.buy(40, 1)
 
 
