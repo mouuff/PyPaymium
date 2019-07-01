@@ -23,6 +23,7 @@ print(api_call_response.text)
 def main():
     p = Paymium()
     # print(p.get_trades())
+    print(p.get_ticker())
     p.user_auth()
     p.refresh_token()
     print(p.get_user())

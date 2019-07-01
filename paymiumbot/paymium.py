@@ -73,5 +73,8 @@ class Paymium:
     def get_trades(self):
         return self.public_get("/api/v1/data/eur/trades")
 
+    def get_ticker(self):
+        return self.public_get("/api/v1/data/eur/ticker")
+
     def get_user(self):
         return self.get("/api/v1/user")
