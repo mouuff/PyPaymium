@@ -1,15 +1,12 @@
+
 import requests
 import json
 import sys
+import urllib3
 
 from .constants import Constants
 
-authorize_url = "https://www.paymium.com/api/oauth/authorize?client_id=63ad627670dd4d6b25083e2e8454dcaf53202ddf6fcb4e4a4b42aa4e8ccbcc19&redirect_uri=https%3A%2F%2Fwww.paymium.com%2Fpage%2Foauth%2Ftest&response_type=code"
-token_url = "https://paymium.com/api/oauth/token"
-redirect_uri = "https://www.paymium.com/page/oauth/test"
-
-client_id = '63ad627670dd4d6b25083e2e8454dcaf53202ddf6fcb4e4a4b42aa4e8ccbcc19'
-client_secret = '7de4b1015e19590efb7c6abaf4db19170fd9884bc717bf2a8bb18c6c2863d924'
+urllib3.disable_warnings()
 
 
 def _assert_headers_ok(resp):
@@ -18,12 +15,14 @@ def _assert_headers_ok(resp):
 
 
 class Paymium:
-    def __init__(self):
+    def __init__(self, client_id, client_secret):
         self.token = None
+        self.client_id = client_id
+        self.client_secret = client_secret
 
     def post(self, url, data):
         resp = requests.post(url, data=data, verify=False,
-                             allow_redirects=False, auth=(client_id, client_secret))
+                             allow_redirects=False, auth=(self.client_id, self.client_secret))
         _assert_headers_ok(resp)
         return resp
 
@@ -45,10 +44,10 @@ class Paymium:
     def new_token(self, code):
         data = {
             "grant_type": 'authorization_code',
-            "redirect_uri": redirect_uri,
+            "redirect_uri": Constants.URL_REDIRECT,
             "code": code
         }
-        access_token_response = self.post(token_url, data)
+        access_token_response = self.post(Constants.URL_TOKEN, data)
 
         self.token = json.loads(access_token_response.text)
         '''body = {"access_token": "xxx", "token_type": "bearer", "expires_in": 1800,
@@ -58,14 +57,15 @@ class Paymium:
     def refresh_token(self):
         data = {
             "grant_type": 'refresh_token',
-            "redirect_uri": redirect_uri,
+            "redirect_uri": Constants.URL_REDIRECT,
             "refresh_token": self.token["refresh_token"]
         }
-        refresh_token_response = self.post(token_url, data)
+        refresh_token_response = self.post(Constants.URL_TOKEN, data)
         self.token = json.loads(refresh_token_response.text)
 
     def user_auth(self):
-        print(authorize_url)
+        print("https://www.paymium.com/api/oauth/authorize?client_id=" + self.client_id +
+              "&redirect_uri=https%3A%2F%2Fwww.paymium.com%2Fpage%2Foauth%2Ftest&response_type=code")
         code = input('code: ')
         self.new_token(code)
         print("Auth successful")
