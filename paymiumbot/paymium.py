@@ -12,7 +12,7 @@ client_secret = '7de4b1015e19590efb7c6abaf4db19170fd9884bc717bf2a8bb18c6c2863d92
 
 class Paymium:
     def __init__(self):
-        pass
+        self.token = None
 
     def post(self, url, data, assert_ok=True):
         resp = requests.post(url, data=data, verify=False,
@@ -22,9 +22,7 @@ class Paymium:
                 'Status != 200 OK : ' + str(resp.headers))
         return resp
 
-    def authorize(self):
-        print(authorize_url)
-        code = input('code: ')
+    def get_token(self, code):
         data = {
             "client_id": client_id,
             "client_secret": client_secret,
@@ -35,8 +33,16 @@ class Paymium:
         access_token_response = self.post(token_url, data)
 
         body = json.loads(access_token_response.text)
-        '''
-        body = {"access_token": "xxx", "token_type": "bearer", "expires_in": 1800,
-        "refresh_token": "xxx", "scope": "basic", "created_at": 1561993742}
+        '''body = {"access_token": "xxx", "token_type": "bearer", "expires_in": 1800,
+           "refresh_token": "xxx", "scope": "basic", "created_at": 1561993742}
         '''
         return body
+
+    def refresh_token(self):
+        pass
+
+    def user_auth(self):
+        print(authorize_url)
+        code = input('code: ')
+        self.token = self.get_token(code)
+        print("Auth successful")
