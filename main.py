@@ -10,7 +10,10 @@ def main():
     p.user_auth()
     p.refresh_token()
     # print(p.get_user())
-    p.buy(40, 1)
+    print(p.get_ticker())
+    print(p.get_ticker())
+    p.buy_at(40, 1)
+    print(p.get_ticker())
 
 
 if __name__ == "__main__":

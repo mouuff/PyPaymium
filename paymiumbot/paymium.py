@@ -11,8 +11,8 @@ urllib3.disable_warnings()
 
 
 def _assert_headers_ok(resp):
-    if resp.headers["Status"] != "200 OK":
-        raise AssertionError('Status != 200 OK : ' + str(resp.headers))
+    if not resp.headers["Status"].startswith("2"):
+        raise AssertionError('Status != 2xx: ' + str(resp.headers))
 
 
 class Paymium:
@@ -104,8 +104,8 @@ class Paymium:
         }
         return self.post_order(data)
 
-    def buy(self, price, amount):
-        return self.post_limit_order("buy", price, amount)
+    def buy_at(self, price, btc_amount):
+        return self.post_limit_order("buy", price, btc_amount)
 
-    def sell(self, price, amount):
-        return self.post_limit_order("sell", price, amount)
+    def sell_at(self, price, btc_amount):
+        return self.post_limit_order("sell", price, btc_amount)
