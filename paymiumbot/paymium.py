@@ -49,12 +49,17 @@ class Paymium:
 
     @property
     def token(self):
+        """Current oauth token
+        """
         if not self._token:
             return self._token
         return self._token.copy()
 
     @property
     def xrate(self):
+        """API calls remaining for the current day
+        This can be found in resp headers
+        """
         return self._xrate
 
     @property
@@ -62,9 +67,17 @@ class Paymium:
         return {"Authorization": "Bearer " + self.token["access_token"]}
 
     def _update_xrate(self, resp):
-        self._xrate = resp.headers["X-Ratelimit-Remaining"]
+        if "X-Ratelimit-Remaining" in resp.headers:
+            self._xrate = resp.headers["X-Ratelimit-Remaining"]
+        else:
+            print("Warning: X-Ratelimit-Remaining not found in header",
+                  file=sys.stderr)
+            if self._xrate:
+                self._xrate -= 1
 
     def post_auth(self, url, **kwargs):
+        """ HTTP POST with auth info filled
+        """
         resp = requests.post(url, verify=False,
                              allow_redirects=False, auth=(self.client_id, self.client_secret),
                              **kwargs)
@@ -72,22 +85,28 @@ class Paymium:
         self._update_xrate(resp)
         return resp
 
-    def post(self, path, **kwargs):
-        resp = requests.post(Constants.URL_API + path, headers=self._bearer_headers, verify=False,
+    def post(self, path, url_prefix=Constants.URL_API, **kwargs):
+        """ HTTP POST to api with oauth token filled
+        """
+        resp = requests.post(url_prefix + path, headers=self._bearer_headers, verify=False,
                              allow_redirects=False, **kwargs)
         helper.assert_status_ok(resp)
         self._update_xrate(resp)
 
-    def public_get(self, path, **kwargs):
+    def public_get(self, path, url_prefix=Constants.URL_API, **kwargs):
+        """ HTTP GET WITHOUT oauth token filled
+        """
         resp = requests.get(
-            Constants.URL_API + path, verify=False, **kwargs)
+            url_prefix + path, verify=False, **kwargs)
         helper.assert_status_ok(resp)
         self._update_xrate(resp)
         return json.loads(resp.text)
 
-    def get(self, path, **kwargs):
-        resp = requests.get(
-            Constants.URL_API + path, verify=False, headers=self._bearer_headers, **kwargs)
+    def get(self, path, url_prefix=Constants.URL_API, **kwargs):
+        """ HTTP GET with oauth token filled
+        """
+        resp = requests.get(url_prefix + path, verify=False,
+                            headers=self._bearer_headers, **kwargs)
         helper.assert_status_ok(resp)
         self._update_xrate(resp)
         return json.loads(resp.text)
