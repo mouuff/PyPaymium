@@ -18,6 +18,7 @@ def main():
     # print(p.get_user())
     #p.buy_at(40, 1)
     print(p.get_ticker())
+    print(p.xrate)
 
 
 if __name__ == "__main__":
