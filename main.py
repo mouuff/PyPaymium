@@ -1,6 +1,6 @@
 
 import time
-from paymium import Api
+import paymium
 
 # Get your client id and secret here by creating a new application:
 # https://www.paymium.com/page/developers/apps
@@ -9,7 +9,7 @@ client_secret = 'xxxxx'
 
 
 def main():
-    p = Api(client_id, client_secret)
+    p = paymium.Api(client_id, client_secret)
     print(p.get_trades(since=time.time()-1000))
     # print(p.get_ticker())
     p.user_auth()
