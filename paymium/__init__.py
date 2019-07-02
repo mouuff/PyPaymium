@@ -1,2 +1,2 @@
-from .paymium import Paymium
+from .api import Api
 from .constants import Constants

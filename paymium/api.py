@@ -33,7 +33,7 @@ def _read_token():
     return token
 
 
-class Paymium:
+class Api:
     def __init__(self, client_id, client_secret, use_saved_token=True):
         self._token = None
         if use_saved_token:

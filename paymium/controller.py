@@ -1,5 +1,5 @@
 
-from .paymium import Paymium
+from .api import Api
 from .base_bot import BaseBot
 import time
 

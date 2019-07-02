@@ -1,1 +1,3 @@
-# PaymiumBot
+# PyPaymium
+
+# WIP
