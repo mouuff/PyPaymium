@@ -8,16 +8,11 @@ import urllib3
 import time
 
 from .constants import Constants
-from .helper import get_script_path
+from . import helper
 
 urllib3.disable_warnings()
 
-token_path = get_script_path("paymium_token.json")
-
-
-def _assert_headers_ok(resp):
-    if not resp.headers["Status"].startswith("2"):
-        raise AssertionError('Status != 2xx: ' + str(resp.headers))
+token_path = helper.get_script_path("paymium_token.json")
 
 
 def _write_token(token):
@@ -65,24 +60,24 @@ class Paymium:
         resp = requests.post(url, verify=False,
                              allow_redirects=False, auth=(self.client_id, self.client_secret),
                              **kwargs)
-        _assert_headers_ok(resp)
+        helper.assert_status_ok(resp)
         return resp
 
     def post(self, path, **kwargs):
         resp = requests.post(Constants.URL_API + path, headers=self._bearer_headers, verify=False,
                              allow_redirects=False, **kwargs)
-        _assert_headers_ok(resp)
+        helper.assert_status_ok(resp)
 
     def public_get(self, path, **kwargs):
         resp = requests.get(
             Constants.URL_API + path, verify=False, **kwargs)
-        _assert_headers_ok(resp)
+        helper.assert_status_ok(resp)
         return json.loads(resp.text)
 
     def get(self, path, **kwargs):
         resp = requests.get(
             Constants.URL_API + path, verify=False, headers=self._bearer_headers, **kwargs)
-        _assert_headers_ok(resp)
+        helper.assert_status_ok(resp)
         return json.loads(resp.text)
 
     def new_token(self, code):
