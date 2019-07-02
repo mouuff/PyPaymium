@@ -143,3 +143,10 @@ class Paymium:
 
     def sell_at(self, price, btc_amount):
         return self.post_limit_order("sell", price, btc_amount)
+
+    def get_orders(self):
+        data = {
+            "active": True
+        }
+        # TODO: add params https://github.com/Paymium/api-documentation#parameters-1
+        return self.get("/api/v1/user/orders", data=data)
