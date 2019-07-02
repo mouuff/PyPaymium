@@ -2,18 +2,20 @@
 import time
 from paymiumbot import Paymium
 
+# Get your client id and secret here by creating a new application:
+# https://www.paymium.com/page/developers/apps
+client_id = 'xxxxx'
+client_secret = 'xxxxx'
+
 
 def main():
-    p = Paymium('63ad627670dd4d6b25083e2e8454dcaf53202ddf6fcb4e4a4b42aa4e8ccbcc19',
-                '7de4b1015e19590efb7c6abaf4db19170fd9884bc717bf2a8bb18c6c2863d924')
+    p = Paymium(client_id, client_secret)
     print(p.get_trades(since=time.time()-1000))
     # print(p.get_ticker())
     p.user_auth()
     p.refresh_token()
     print("Refreshed token")
     # print(p.get_user())
-    print(p.get_ticker())
-    print(p.get_ticker())
     #p.buy_at(40, 1)
     print(p.get_ticker())
 
