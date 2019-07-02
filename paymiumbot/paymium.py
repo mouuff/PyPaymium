@@ -61,26 +61,27 @@ class Paymium:
     def _bearer_headers(self):
         return {"Authorization": "Bearer " + self.token["access_token"]}
 
-    def post_auth(self, url, data):
-        resp = requests.post(url, data=data, verify=False,
-                             allow_redirects=False, auth=(self.client_id, self.client_secret))
+    def post_auth(self, url, **kwargs):
+        resp = requests.post(url, verify=False,
+                             allow_redirects=False, auth=(self.client_id, self.client_secret),
+                             **kwargs)
         _assert_headers_ok(resp)
         return resp
 
-    def post(self, path, data):
-        resp = requests.post(Constants.URL_API + path, data=data, headers=self._bearer_headers, verify=False,
-                             allow_redirects=False)
+    def post(self, path, **kwargs):
+        resp = requests.post(Constants.URL_API + path, headers=self._bearer_headers, verify=False,
+                             allow_redirects=False, **kwargs)
         _assert_headers_ok(resp)
 
-    def public_get(self, path, data):
+    def public_get(self, path, **kwargs):
         resp = requests.get(
-            Constants.URL_API + path, data=data, verify=False)
+            Constants.URL_API + path, verify=False, **kwargs)
         _assert_headers_ok(resp)
         return json.loads(resp.text)
 
-    def get(self, path):
+    def get(self, path, **kwargs):
         resp = requests.get(
-            Constants.URL_API + path, verify=False, headers=self._bearer_headers)
+            Constants.URL_API + path, verify=False, headers=self._bearer_headers, **kwargs)
         _assert_headers_ok(resp)
         return json.loads(resp.text)
 
@@ -90,7 +91,7 @@ class Paymium:
             "redirect_uri": Constants.URL_REDIRECT,
             "code": code
         }
-        access_token_response = self.post_auth(Constants.URL_TOKEN, data)
+        access_token_response = self.post_auth(Constants.URL_TOKEN, data=data)
         self._set_token(json.loads(access_token_response.text))
 
     def refresh_token(self):
@@ -99,7 +100,7 @@ class Paymium:
             "redirect_uri": Constants.URL_REDIRECT,
             "refresh_token": self.token["refresh_token"]
         }
-        refresh_token_response = self.post_auth(Constants.URL_TOKEN, data)
+        refresh_token_response = self.post_auth(Constants.URL_TOKEN, data=data)
         self._set_token(json.loads(refresh_token_response.text))
 
     def user_auth(self):
@@ -124,7 +125,7 @@ class Paymium:
         return self.public_get("/api/v1/data/eur/trades", data=data)
 
     def get_ticker(self):
-        return self.public_get("/api/v1/data/eur/ticker", {})
+        return self.public_get("/api/v1/data/eur/ticker")
 
     def get_user(self):
         return self.get("/api/v1/user")
