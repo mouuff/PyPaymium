@@ -40,6 +40,7 @@ class Paymium:
             self._token = _read_token()
         self.client_id = client_id
         self.client_secret = client_secret
+        self._xrate = None
 
     def _set_token(self, token):
         assert token != None
@@ -53,31 +54,42 @@ class Paymium:
         return self._token.copy()
 
     @property
+    def xrate(self):
+        return self._xrate
+
+    @property
     def _bearer_headers(self):
         return {"Authorization": "Bearer " + self.token["access_token"]}
+
+    def _update_xrate(self, resp):
+        self._xrate = resp.headers["X-Ratelimit-Remaining"]
 
     def post_auth(self, url, **kwargs):
         resp = requests.post(url, verify=False,
                              allow_redirects=False, auth=(self.client_id, self.client_secret),
                              **kwargs)
         helper.assert_status_ok(resp)
+        self._update_xrate(resp)
         return resp
 
     def post(self, path, **kwargs):
         resp = requests.post(Constants.URL_API + path, headers=self._bearer_headers, verify=False,
                              allow_redirects=False, **kwargs)
         helper.assert_status_ok(resp)
+        self._update_xrate(resp)
 
     def public_get(self, path, **kwargs):
         resp = requests.get(
             Constants.URL_API + path, verify=False, **kwargs)
         helper.assert_status_ok(resp)
+        self._update_xrate(resp)
         return json.loads(resp.text)
 
     def get(self, path, **kwargs):
         resp = requests.get(
             Constants.URL_API + path, verify=False, headers=self._bearer_headers, **kwargs)
         helper.assert_status_ok(resp)
+        self._update_xrate(resp)
         return json.loads(resp.text)
 
     def new_token(self, code):
