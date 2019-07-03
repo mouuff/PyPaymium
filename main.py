@@ -14,11 +14,8 @@ def main():
     p.refresh_token()
     print("Refreshed token")
     # print(p.get_user())
-    print(p.get_orders())
     p.buy_at(40, 1)
     print(p.get_orders())
-
-    print(p.get_orders(True))
 
     print(p.xrate)
 
