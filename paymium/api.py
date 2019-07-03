@@ -187,15 +187,29 @@ class Api:
         }
         return self.post_order(data)
 
-    def buy_at(self, price, btc_amount):
+    def buy_limit(self, price, btc_amount):
         """ Buy bitcoin at given price limit
         """
         return self.post_limit_order("buy", price, btc_amount)
 
-    def sell_at(self, price, btc_amount):
+    def sell_limit(self, price, btc_amount):
         """ Sell bitcoin at given price limit
         """
         return self.post_limit_order("sell", price, btc_amount)
+
+    def post_market_order(self, direction, btc_amount=None, eur_amount=None):
+        assert btc_amount is not None or eur_amount is not None
+        assert not (btc_amount is None and eur_amount is None)
+        data = {
+            "type": "MarketOrder",
+            "currency": "EUR",
+            "direction": direction,
+        }
+        if btc_amount:
+            data["amount"] = btc_amount
+        if eur_amount:
+            data["currency_amount"] = eur_amount
+        return self.post_order(data)
 
     def get_orders(self, active=True):
         """ Read user's orders.
