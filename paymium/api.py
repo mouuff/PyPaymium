@@ -152,15 +152,26 @@ class Api:
         print("Auth successful")
 
     def get_trades(self, since=None):
+        """ Read the latest executed trades.
+        """
         data = {}
         if since:
             data["since"] = int(since)
         return self.public_get("/api/v1/data/eur/trades", data=data)
 
     def get_ticker(self):
+        """ Read the latest ticker data.
+        """
         return self.public_get("/api/v1/data/eur/ticker")
 
+    def get_depth(self):
+        """ Read the market depth. Bids and asks are grouped by price.
+        """
+        return self.public_get("/api/v1/data/eur/depth")
+
     def get_user(self):
+        """ Read the latest user info.
+        """
         return self.get("/api/v1/user")
 
     def post_order(self, data):
@@ -177,12 +188,18 @@ class Api:
         return self.post_order(data)
 
     def buy_at(self, price, btc_amount):
+        """ Buy bitcoin at given price limit
+        """
         return self.post_limit_order("buy", price, btc_amount)
 
     def sell_at(self, price, btc_amount):
+        """ Sell bitcoin at given price limit
+        """
         return self.post_limit_order("sell", price, btc_amount)
 
     def get_orders(self):
+        """ Read active user's orders.
+        """
         data = {
             "active": True
         }
