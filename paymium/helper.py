@@ -14,3 +14,10 @@ def get_script_path(*args):
 def assert_status_ok(resp):
     if not resp.ok:
         raise AssertionError('Status != 2xx: ' + str(resp.headers))
+
+
+def my_getenv(key):
+    value = os.getenv(key)
+    if value is None:
+        raise AssertionError("Env variable: %s is not set" % key)
+    return value

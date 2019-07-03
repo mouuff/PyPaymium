@@ -34,8 +34,14 @@ def _read_token():
 
 
 class Api:
-    def __init__(self, client_id, client_secret,
+    def __init__(self,
+                 client_id=None,
+                 client_secret=None,
                  use_saved_token=True):
+        if client_id is None:
+            client_id = helper.my_getenv(Constants.ENV_CLIENT_ID)
+        if client_secret is None:
+            client_secret = helper.my_getenv(Constants.ENV_CLIENT_SECRET)
         self._token = None
         if use_saved_token:
             self._token = _read_token()
