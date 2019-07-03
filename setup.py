@@ -13,7 +13,7 @@ setup(
     name='paymium',
     packages=packages,
     version='1.0',
-    description='Paymium api',
+    description='Paymium API',
     author='mouuff',
     long_description=long_description,
     long_description_content_type="text/markdown",

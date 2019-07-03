@@ -34,7 +34,8 @@ def _read_token():
 
 
 class Api:
-    def __init__(self, client_id, client_secret, use_saved_token=True):
+    def __init__(self, client_id, client_secret,
+                 use_saved_token=True):
         self._token = None
         if use_saved_token:
             self._token = _read_token()
@@ -111,19 +112,19 @@ class Api:
         self._update_xrate(resp)
         return json.loads(resp.text)
 
-    def new_token(self, code):
+    def new_token(self, code, redirect=Constants.URL_REDIRECT):
         data = {
             "grant_type": 'authorization_code',
-            "redirect_uri": Constants.URL_REDIRECT,
+            "redirect_uri": redirect,
             "code": code
         }
         access_token_response = self.post_auth(Constants.URL_TOKEN, data=data)
         self._set_token(json.loads(access_token_response.text))
 
-    def refresh_token(self):
+    def refresh_token(self, redirect=Constants.URL_REDIRECT):
         data = {
             "grant_type": 'refresh_token',
-            "redirect_uri": Constants.URL_REDIRECT,
+            "redirect_uri": redirect,
             "refresh_token": self.token["refresh_token"]
         }
         refresh_token_response = self.post_auth(Constants.URL_TOKEN, data=data)
