@@ -197,11 +197,11 @@ class Api:
         """
         return self.post_limit_order("sell", price, btc_amount)
 
-    def get_orders(self):
-        """ Read active user's orders.
+    def get_orders(self, active=True):
+        """ Read user's orders.
         """
-        data = {
-            "active": True
-        }
+        data = {}
+        if active:
+            data["active"] = True
         # TODO: add params https://github.com/Paymium/api-documentation#parameters-1
         return self.get("/api/v1/user/orders", data=data)
