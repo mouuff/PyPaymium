@@ -67,7 +67,7 @@ class Api:
         """API calls remaining for the current day
         This can be found in resp headers
         """
-        return self._xrate
+        return int(self._xrate)
 
     @property
     def _bearer_headers(self):
