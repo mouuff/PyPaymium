@@ -82,14 +82,17 @@ class Api:
             if self._xrate:
                 self._xrate -= 1
 
+    def _process_resp(self, resp):
+        self._update_xrate(resp)
+        helper.assert_status_ok(resp)
+
     def post_auth(self, url, **kwargs):
         """ HTTP POST with auth info filled
         """
         resp = requests.post(url, verify=False,
                              allow_redirects=False, auth=(self.client_id, self.client_secret),
                              **kwargs)
-        helper.assert_status_ok(resp)
-        self._update_xrate(resp)
+        self._process_resp(resp)
         return resp
 
     def post(self, path, url_prefix=Constants.URL_API, **kwargs):
@@ -97,16 +100,14 @@ class Api:
         """
         resp = requests.post(url_prefix + path, headers=self._bearer_headers, verify=False,
                              allow_redirects=False, **kwargs)
-        helper.assert_status_ok(resp)
-        self._update_xrate(resp)
+        self._process_resp(resp)
 
     def public_get(self, path, url_prefix=Constants.URL_API, **kwargs):
         """ HTTP GET WITHOUT oauth token filled
         """
         resp = requests.get(
             url_prefix + path, verify=False, **kwargs)
-        helper.assert_status_ok(resp)
-        self._update_xrate(resp)
+        self._process_resp(resp)
         return json.loads(resp.text)
 
     def get(self, path, url_prefix=Constants.URL_API, **kwargs):
@@ -114,8 +115,7 @@ class Api:
         """
         resp = requests.get(url_prefix + path, verify=False,
                             headers=self._bearer_headers, **kwargs)
-        helper.assert_status_ok(resp)
-        self._update_xrate(resp)
+        self._process_resp(resp)
         return json.loads(resp.text)
 
     def new_token(self, code, redirect=Constants.URL_REDIRECT):
