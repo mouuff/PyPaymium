@@ -20,13 +20,8 @@ def main():
     # print(p.get_ticker())
     p.user_auth()
     p.refresh_token()
+    print(p._token)
     print("Refreshed token")
-    # print(p.get_user())
-    # p.buy_limit(40, 1)
-    print(p.get_orders())
-    print(p.xrate)
-    print(p.get_ticker())
-
     c = Controller(p)
     c.run()
 

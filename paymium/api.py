@@ -51,6 +51,11 @@ class Api:
 
     def _set_token(self, token):
         assert token != None
+        if "created_at" in token:
+            time_diff = abs(time.time() - token["created_at"])
+            if time_diff > 5:
+                print("Warning your pc's time != paymium's time", file=sys.stderr)
+                print("This could prevent tokens from refreshing", file=sys.stderr)
         self._token = token
         _write_token(token)
 
