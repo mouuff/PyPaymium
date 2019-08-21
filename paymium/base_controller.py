@@ -1,7 +1,9 @@
 
 import time
+import sys
 from abc import abstractmethod, ABC
 from .api import Api
+from .constants import Constants
 
 
 class BaseController(ABC):
@@ -32,6 +34,9 @@ class BaseController(ABC):
         self._running = True
         while self._running:
             self.update()
+            if self.api.token_expires_in < Constants.TOKEN_REFRESH_BEFORE:
+                self.api.refresh_token()
+                print("Refreshed token", file=sys.stderr)
             self._calc_average_xrate()
             self._loop_count += 1
             time.sleep(1)
