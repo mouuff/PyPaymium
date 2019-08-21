@@ -12,6 +12,7 @@ class Controller(paymium.BaseController):
         print(self.api.xrate)
         print(self.api.get_ticker())
         print(self.average_xrate)
+        print(self.api.token_expires_in)
 
 
 def main():

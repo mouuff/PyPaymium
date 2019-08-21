@@ -51,13 +51,18 @@ class Api:
 
     def _set_token(self, token):
         assert token != None
-        if "created_at" in token:
-            time_diff = abs(time.time() - token["created_at"])
-            if time_diff > 5:
-                print("Warning your pc's time != paymium's time", file=sys.stderr)
-                print("This could prevent tokens from refreshing", file=sys.stderr)
         self._token = token
+        self._token["created_at"] = time.time()
         _write_token(token)
+
+    @property
+    def token_expires_in(self):
+        """Time before token expires"""
+        if self._token is None:
+            print("Warning: time_before_expiration: no token", file=sys.stderr)
+            return 0
+        expires_at = self._token["created_at"] + self._token["expires_in"]
+        return expires_at - time.time()
 
     @property
     def token(self):
