@@ -29,9 +29,8 @@ class Controller(paymium.BaseController):
         self.balance_btc = user_info["balance_btc"]
         bid = ticker["bid"]
         ask = ticker["ask"]
-        loss = ask * Constants.TRADING_FEES + bid * Constants.TRADING_FEES
         spread = ask - bid
-        potential = spread - loss
+        potential = ((ask / bid) - 1) - Constants.TRADING_FEES * 2
         # print(ticker)
         orders = self.api.get_orders()
         if len(orders):
@@ -47,14 +46,14 @@ class Controller(paymium.BaseController):
                         self.api.cancel_order(uuid)
                         print("Cancelled sell order")
         else:
+            if potential > (1/100):
+                print("potential too low: " + str(potential))
+                return
+            print("Potential: " + str(potential))
             if self.balance_btc == 0:
-                print("Potential: " + str(potential))
-                if potential < 10:
-                    print("potential too low: " + str(potential))
-                    return
-                self.buy_all(bid + potential / 2.1)
+                self.buy_all(bid * (1 + potential / 2))
             else:
-                self.sell_all(ask - potential / 2.1)
+                self.sell_all(ask * (1 - potential / 2))
 
 
 def main():
