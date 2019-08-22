@@ -24,11 +24,9 @@ class Controller(paymium.BaseController):
 
 def main():
     p = paymium.Api()
-    print(p.get_trades(since=time.time()-1000))
-    # print(p.get_ticker())
+    # print(p.get_trades(since=time.time()-1000))
     p.user_auth()
     p.refresh_token()
-    print(p._token)
     print("Refreshed token")
     c = Controller(p)
     c.run()
