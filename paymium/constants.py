@@ -7,4 +7,4 @@ class Constants:
     ENV_CLIENT_ID = "PAYMIUM_CLIENT_ID"
     ENV_CLIENT_SECRET = "PAYMIUM_CLIENT_SECRET"
     TOKEN_REFRESH_BEFORE = 240  # refresh token 4 mins before expiration
-    TRADING_FEES = 1 - (0.2 / 100)  # 0.2% fee
+    TRADING_FEES = 1 + (0.2 / 100)  # 0.2% fee
