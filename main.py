@@ -10,6 +10,18 @@ from paymium import Constants
 class Controller(paymium.BaseController):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.btc_limit = 0.002
+        self.buying = True
+
+    def buy(self, price):
+        amount = self.btc_limit
+        print("Buying " + str(amount) + " at: " + str(price))
+        self.api.buy_limit(price, amount)
+
+    def sell(self, price):
+        amount = self.api.get_user()["balance_btc"]
+        print("Buying " + str(amount) + " at: " + str(price))
+        self.api.buy_limit(price, amount)
 
     def update(self):
         ticker = self.api.get_ticker()
@@ -18,8 +30,21 @@ class Controller(paymium.BaseController):
         loss = ask * Constants.TRADING_FEES + bid * Constants.TRADING_FEES
         spread = ask - bid
         potential = spread - loss
-        print(spread)
-        print(potential)
+        # print(potential)
+        print(ticker)
+        orders = self.api.get_orders()
+        if len(orders):
+            print(orders)
+        else:
+            if self.buying:
+                if potential < 10:
+                    print("potential too low: " + str(potential))
+                    return
+                self.buy(bid + potential / 3)
+                self.buying = False
+            else:
+                self.api.sell_limit(ask - potential / 3)
+                self.buying = True
 
 
 def main():

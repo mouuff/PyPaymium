@@ -188,6 +188,7 @@ class Api:
         return self.post("/api/v1/user/orders", data=data)
 
     def post_limit_order(self, direction, price, amount):
+        price = round(price, 2)  # paymium doesnt allow unrounded numbers
         data = {
             "type": "LimitOrder",
             "currency": "EUR",
