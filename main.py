@@ -11,21 +11,17 @@ class Controller(paymium.BaseController):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.btc_limit = 0.002
-        self.last_bid = None
-        self.last_ask = None
         self.balance_btc = None
 
     def buy(self, price):
         amount = self.btc_limit
         print("Buying " + str(amount) + " at: " + str(price))
         self.api.buy_limit(price, amount)
-        self.last_bid = amount
 
     def sell(self, price):
         amount = self.api.get_user()["balance_btc"]
         print("Buying " + str(amount) + " at: " + str(price))
         self.api.buy_limit(price, amount)
-        self.last_ask = amount
 
     def update(self):
         ticker = self.api.get_ticker()
@@ -41,9 +37,9 @@ class Controller(paymium.BaseController):
         orders = self.api.get_orders()
         if len(orders):
             for order in orders:
-                price = order['price']
+                price = order["price"]
                 uuid = order["uuid"]
-                if order['direction'] == 'buy':
+                if order["direction"] == "buy":
                     if price < bid:
                         self.api.cancel_order(uuid)
                 else:
