@@ -7,12 +7,11 @@ import paymium
 
 
 class Controller(paymium.BaseController):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def update(self):
-        print(self.api.get_orders())
-        print(self.api.xrate)
         print(self.api.get_ticker())
-        print(self.average_xrate)
-        print(self.api.token_expires_in)
 
 
 def main():
