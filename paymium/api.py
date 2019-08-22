@@ -230,3 +230,6 @@ class Api:
             data["active"] = True
         # TODO: add params https://github.com/Paymium/api-documentation#parameters-1
         return self.get("/api/v1/user/orders", data=data)
+
+    def cancel_order(uuid):
+        pass

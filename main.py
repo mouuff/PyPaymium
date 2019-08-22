@@ -11,20 +11,26 @@ class Controller(paymium.BaseController):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.btc_limit = 0.002
-        self.buying = True
+        self.last_bid = None
+        self.last_ask = None
+        self.balance_btc = None
 
     def buy(self, price):
         amount = self.btc_limit
         print("Buying " + str(amount) + " at: " + str(price))
         self.api.buy_limit(price, amount)
+        self.last_bid = amount
 
     def sell(self, price):
         amount = self.api.get_user()["balance_btc"]
         print("Buying " + str(amount) + " at: " + str(price))
         self.api.buy_limit(price, amount)
+        self.last_ask = amount
 
     def update(self):
         ticker = self.api.get_ticker()
+        user_info = self.api.get_user()
+        self.balance_btc = user_info["balance_btc"]
         bid = ticker["bid"]
         ask = ticker["ask"]
         loss = ask * Constants.TRADING_FEES + bid * Constants.TRADING_FEES
@@ -34,17 +40,23 @@ class Controller(paymium.BaseController):
         print(ticker)
         orders = self.api.get_orders()
         if len(orders):
-            print(orders)
+            for order in orders:
+                price = order['price']
+                uuid = order["uuid"]
+                if order['direction'] == 'buy':
+                    if price < bid:
+                        self.api.cancel_order(uuid)
+                else:
+                    if price > ask:
+                        self.api.cancel_order(uuid)
         else:
-            if self.buying:
+            if self.balance_btc == 0:
                 if potential < 10:
                     print("potential too low: " + str(potential))
                     return
                 self.buy(bid + potential / 3)
-                self.buying = False
             else:
-                self.api.sell_limit(ask - potential / 3)
-                self.buying = True
+                self.sell(ask - potential / 3)
 
 
 def main():
