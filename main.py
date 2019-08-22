@@ -15,10 +15,11 @@ class Controller(paymium.BaseController):
         ticker = self.api.get_ticker()
         bid = ticker["bid"]
         ask = ticker["ask"]
+        loss = ask * Constants.TRADING_FEES + bid * Constants.TRADING_FEES
         spread = ask - bid
-        real_spread = ask * Constants.TRADING_FEES - bid * Constants.TRADING_FEES
+        potential = spread - loss
         print(spread)
-        print(real_spread)
+        print(potential)
 
 
 def main():
