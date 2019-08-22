@@ -13,12 +13,12 @@ class Controller(paymium.BaseController):
         self.btc_limit = 0.002
         self.balance_btc = None
 
-    def buy(self, price):
+    def buy_all(self, price):
         amount = self.btc_limit
         print("Buying " + str(amount) + " at: " + str(price))
         self.api.buy_limit(price, amount)
 
-    def sell(self, price):
+    def sell_all(self, price):
         amount = self.api.get_user()["balance_btc"]
         print("Selling " + str(amount) + " at: " + str(price))
         self.api.sell_limit(price, amount)
@@ -41,18 +41,20 @@ class Controller(paymium.BaseController):
                 if order["direction"] == "buy":
                     if price < bid:
                         self.api.cancel_order(uuid)
+                        print("Cancelled buy order")
                 else:
                     if price > ask:
                         self.api.cancel_order(uuid)
+                        print("Cancelled sell order")
         else:
             if self.balance_btc == 0:
                 print("Potential: " + str(potential))
                 if potential < 10:
                     print("potential too low: " + str(potential))
                     return
-                self.buy(bid + potential / 2.5)
+                self.buy_all(bid + potential / 2.1)
             else:
-                self.sell(ask - potential / 2.5)
+                self.sell_all(ask - potential / 2.1)
 
 
 def main():
