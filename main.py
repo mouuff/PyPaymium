@@ -51,9 +51,9 @@ class Controller(paymium.BaseController):
                 return
             print("Potential: " + str(potential))
             if self.balance_btc == 0:
-                self.buy_all(bid * (1 + potential / 2))
+                self.buy_all(bid * (1 + potential / 2.1))
             else:
-                self.sell_all(ask * (1 - potential / 2))
+                self.sell_all(ask * (1 - potential / 2.1))
 
 
 def main():
