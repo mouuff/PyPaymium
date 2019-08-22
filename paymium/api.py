@@ -120,6 +120,12 @@ class Api:
         self._process_resp(resp)
         return json.loads(resp.text)
 
+    def delete(self, path, url_prefix=Constants.URL_API, **kwargs):
+        """ HTTP DELETE with oauth token filled
+        """
+        requests.delete(url_prefix + path, verify=False,
+                        headers=self._bearer_headers, **kwargs)
+
     def get(self, path, url_prefix=Constants.URL_API, **kwargs):
         """ HTTP GET with oauth token filled
         """
@@ -231,5 +237,5 @@ class Api:
         # TODO: add params https://github.com/Paymium/api-documentation#parameters-1
         return self.get("/api/v1/user/orders", data=data)
 
-    def cancel_order(uuid):
-        pass
+    def cancel_order(self, uuid):
+        return self.delete("/api/v1/user/orders/%s/cancel" % uuid)
