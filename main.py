@@ -1,6 +1,7 @@
 
 import time
 import paymium
+from paymium import Constants
 
 # Get your client id and secret here by creating a new application:
 # https://www.paymium.com/page/developers/apps
@@ -11,7 +12,13 @@ class Controller(paymium.BaseController):
         super().__init__(*args, **kwargs)
 
     def update(self):
-        print(self.api.get_ticker())
+        ticker = self.api.get_ticker()
+        bid = ticker["bid"]
+        ask = ticker["ask"]
+        spread = ask - bid
+        real_spread = ask * Constants.TRADING_FEES - bid * Constants.TRADING_FEES
+        print(spread)
+        print(real_spread)
 
 
 def main():
