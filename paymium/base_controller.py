@@ -39,7 +39,7 @@ class BaseController(ABC):
                 print("Refreshed token", file=sys.stderr)
             self._calc_average_xrate()
             self._loop_count += 1
-            time.sleep(1)
+            time.sleep(0.5)
 
     @abstractmethod
     def update(self):
