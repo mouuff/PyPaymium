@@ -28,7 +28,7 @@ class Controller(paymium.BaseController):
     def update(self):
         ticker = self.api.get_ticker()
         user_info = self.api.get_user()
-        self.balance_btc = user_info["balance_btc"]
+        balance_btc = user_info["balance_btc"]
         bid = ticker["bid"]
         ask = ticker["ask"]
         ticker_price = ticker["price"]
@@ -53,7 +53,7 @@ class Controller(paymium.BaseController):
                 print("potential too low: " + str(potential))
                 return
             print("Potential: " + str(potential))
-            if self.balance_btc == 0:
+            if balance_btc == 0:
                 price = bid + self.offer
                 self.buy_all(price)
             else:
