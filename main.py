@@ -10,8 +10,9 @@ from paymium import Constants
 class Controller(paymium.BaseController):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.btc_limit = 0.01
-        self.min_potential = 0.05/100
+        self.btc_limit = 0.01  # btc to trade
+        self.offer = 0.1  # EUR
+        self.min_potential = 0.05/100  # min potential to start trading
         self.balance_btc = None
 
     def buy_all(self, price):
@@ -37,14 +38,14 @@ class Controller(paymium.BaseController):
         orders = self.api.get_orders()
         if len(orders):
             for order in orders:
-                price = order["price"]
+                order_price = order["price"]
                 uuid = order["uuid"]
                 if order["direction"] == "buy":
-                    if price < bid or price > bid + 0.1:
+                    if order_price < bid or order_price > bid + self.offer:
                         self.api.cancel_order(uuid)
                         print("Cancelled buy order")
                 else:
-                    if price > ask or price < ask - 0.1:
+                    if order_price > ask or order_price < ask - self.offer:
                         self.api.cancel_order(uuid)
                         print("Cancelled sell order")
         else:
@@ -53,16 +54,15 @@ class Controller(paymium.BaseController):
                 return
             print("Potential: " + str(potential))
             if self.balance_btc == 0:
-                price = bid + 0.1
+                price = bid + self.offer
                 self.buy_all(price)
             else:
-                price = ask - 0.1
+                price = ask - self.offer
                 self.sell_all(price)
 
 
 def main():
     p = paymium.Api()
-    # print(p.get_trades(since=time.time()-1000))
     p.user_auth()
     p.refresh_token()
     print("Refreshed token")
