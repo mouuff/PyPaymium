@@ -10,8 +10,8 @@ from paymium import Constants
 class Controller(paymium.BaseController):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.btc_limit = 0.002
-        self.min_potential = 0.1/100
+        self.btc_limit = 0.01
+        self.min_potential = 0.05/100
         self.balance_btc = None
 
     def buy_all(self, price):
