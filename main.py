@@ -29,8 +29,8 @@ class Controller(paymium.BaseController):
         ticker = self.api.get_ticker()
         user_info = self.api.get_user()
         balance_btc = user_info["balance_btc"]
-        bid = ticker["bid"]
-        ask = ticker["ask"]
+        bid = float(ticker["bid"])
+        ask = float(ticker["ask"])
         ticker_price = ticker["price"]
         spread = ask - bid
         potential = ((ask / bid) - 1) - Constants.TRADING_FEES * 2
@@ -38,7 +38,7 @@ class Controller(paymium.BaseController):
         orders = self.api.get_orders()
         if len(orders):
             for order in orders:
-                order_price = order["price"]
+                order_price = float(order["price"])
                 uuid = order["uuid"]
                 if order["direction"] == "buy":
                     if order_price < bid or order_price > bid + self.offer:
@@ -62,7 +62,6 @@ class Controller(paymium.BaseController):
 
 
 def main():
-    p = paymium.Api()
     p.user_auth()
     p.refresh_token()
     print("Refreshed token")
