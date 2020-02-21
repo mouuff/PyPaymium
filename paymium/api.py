@@ -6,9 +6,13 @@ import sys
 import os
 import urllib3
 import time
+import logging
 
 from .constants import Constants
 from . import helper
+
+
+logger = logging.getLogger(__file__)
 
 urllib3.disable_warnings()
 
@@ -207,11 +211,13 @@ class Api:
     def buy_limit(self, price, btc_amount):
         """ Buy bitcoin at given price limit
         """
+        logger.info("Buying " + str(btc_amount) + " at: " + str(price))
         return self.post_limit_order("buy", price, btc_amount)
 
     def sell_limit(self, price, btc_amount):
         """ Sell bitcoin at given price limit
         """
+        logger.info("Selling " + str(btc_amount) + " at: " + str(price))
         return self.post_limit_order("sell", price, btc_amount)
 
     def post_market_order(self, direction, btc_amount=None, eur_amount=None):
@@ -238,4 +244,5 @@ class Api:
         return self.get("/api/v1/user/orders", data=data)
 
     def cancel_order(self, uuid):
+        logger.info("Cancelling order: " + str(uuid))
         return self.delete("/api/v1/user/orders/%s/cancel" % uuid)

@@ -1,7 +1,11 @@
 
 import time
+import logging
 import paymium
 from paymium import Constants
+
+
+logger = logging.getLogger(__file__)
 
 # Get your client id and secret here by creating a new application:
 # https://www.paymium.com/page/developers/apps
@@ -10,55 +14,63 @@ from paymium import Constants
 class Controller(paymium.BaseController):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.btc_limit = 0.01  # btc to trade
-        self.offer = 0.1  # EUR
-        self.min_potential = 0.05/100  # min potential to start trading
+        self.trading_btc = 0.01  # btc to trade
+        # offer in EUR compared to highest bid or lowest ask price (used for buy_all / sell_all)
+        self.offer = 0.1
         self.balance_btc = None
+        self.ticker = None
+        self.user_info = None
+
+    @property
+    def bid(self):
+        return float(self.ticker["bid"])
+
+    @property
+    def ask(self):
+        return float(self.ticker["ask"])
+
+    @property
+    def balance_btc(self):
+        return self.api.get_user()["balance_btc"]
 
     def buy_all(self, price):
-        amount = self.btc_limit
-        print("Buying " + str(amount) + " at: " + str(price))
-        self.api.buy_limit(price, amount)
+        self.api.buy_limit(price, self.trading_btc)
 
     def sell_all(self, price):
-        amount = self.api.get_user()["balance_btc"]
-        print("Selling " + str(amount) + " at: " + str(price))
-        self.api.sell_limit(price, amount)
+        self.api.sell_limit(price, self.trading_btc)
+
+    def sell_all_max(self):
+        should_make_order = False
+        orders = self.api.get_orders()
+        for order in orders:
+            order_price = float(order["price"])
+            if order["direction"] == "sell":
+                if order_price > self.ask or order_price < self.ask - self.offer:
+                    self.api.cancel_order(order["uuid"])
+                    should_make_order = True
+        else:
+            should_make_order = True
+        if should_make_order:
+            self.sell_all(self.ask - self.offer)
+
+    def buy_all_max(self):
+        should_make_order = False
+        orders = self.api.get_orders()
+        for order in orders:
+            order_price = float(order["price"])
+            if order["direction"] == "buy":
+                if order_price < self.bid or order_price > self.bid + self.offer:
+                    self.api.cancel_order(order["uuid"])
+                    should_make_order = True
+        else:
+            should_make_order = True
+        if should_make_order:
+            self.buy_all(self.bid + self.offer)
 
     def update(self):
-        ticker = self.api.get_ticker()
-        user_info = self.api.get_user()
-        balance_btc = user_info["balance_btc"]
-        bid = float(ticker["bid"])
-        ask = float(ticker["ask"])
-        ticker_price = ticker["price"]
-        spread = ask - bid
-        potential = ((ask / bid) - 1) - Constants.TRADING_FEES * 2
-        # print(ticker)
-        orders = self.api.get_orders()
-        if len(orders):
-            for order in orders:
-                order_price = float(order["price"])
-                uuid = order["uuid"]
-                if order["direction"] == "buy":
-                    if order_price < bid or order_price > bid + self.offer:
-                        self.api.cancel_order(uuid)
-                        print("Cancelled buy order")
-                else:
-                    if order_price > ask or order_price < ask - self.offer:
-                        self.api.cancel_order(uuid)
-                        print("Cancelled sell order")
-        else:
-            if potential < self.min_potential:
-                print("potential too low: " + str(potential))
-                return
-            print("Potential: " + str(potential))
-            if balance_btc == 0:
-                price = bid + self.offer
-                self.buy_all(price)
-            else:
-                price = ask - self.offer
-                self.sell_all(price)
+        self.ticker = self.api.get_ticker()
+        self.user_info = self.api.get_user()
+        # do whatever you want down here
 
 
 def main():
