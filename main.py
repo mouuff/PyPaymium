@@ -74,6 +74,8 @@ class Controller(paymium.BaseController):
 
 
 def main():
+    p = paymium.Api(client_id="YOUR_ID",
+                    client_secret="YOUR_SECRET")
     p.user_auth()
     p.refresh_token()
     print("Refreshed token")
