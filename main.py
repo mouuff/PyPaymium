@@ -1,11 +1,14 @@
 
+from paymium import Constants
+import paymium
 import time
 import logging
-import paymium
-from paymium import Constants
+
+logging.basicConfig(level=logging.INFO)
 
 
 logger = logging.getLogger(__file__)
+
 
 # Get your client id and secret here by creating a new application:
 # https://www.paymium.com/page/developers/apps
@@ -17,7 +20,6 @@ class Controller(paymium.BaseController):
         self.trading_btc = 0.01  # btc to trade
         # offer in EUR compared to highest bid or lowest ask price (used for buy_all / sell_all)
         self.offer = 0.1
-        self.balance_btc = None
         self.ticker = None
         self.user_info = None
 

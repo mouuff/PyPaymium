@@ -13,6 +13,7 @@ from . import helper
 
 
 logger = logging.getLogger(__file__)
+logger.setLevel(logging.INFO)
 
 urllib3.disable_warnings()
 
