@@ -50,7 +50,7 @@ class Controller(paymium.BaseController):
                 if order_price > self.ask or order_price < self.ask - self.offer:
                     self.api.cancel_order(order["uuid"])
                     should_make_order = True
-        else:
+        if len(orders) == 0:
             should_make_order = True
         if should_make_order:
             self.sell_all(self.ask - self.offer)
@@ -64,7 +64,7 @@ class Controller(paymium.BaseController):
                 if order_price < self.bid or order_price > self.bid + self.offer:
                     self.api.cancel_order(order["uuid"])
                     should_make_order = True
-        else:
+        if len(orders) == 0:
             should_make_order = True
         if should_make_order:
             self.buy_all(self.bid + self.offer)
