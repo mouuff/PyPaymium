@@ -235,12 +235,14 @@ class Api:
             data["currency_amount"] = eur_amount
         return self.post_order(data)
 
-    def get_orders(self, active=True):
+    def get_orders(self, active=True, types=None):
         """ Read user's orders.
         """
         data = {}
         if active:
             data["active"] = True
+        if types:
+            data["types"] = types
         # TODO: add params https://github.com/Paymium/api-documentation#parameters-1
         return self.get("/api/v1/user/orders", data=data)
 
